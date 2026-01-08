@@ -32,7 +32,7 @@ app.get('/animals', async (req, res) => {
     }
 });
 
-app.post('/animals', async (req, res) => {
+app.post('/addAnimals', async (req, res) => {
     const { animal_name, animal_pic } = req.body;
     let connection;
     try {
@@ -50,7 +50,7 @@ app.post('/animals', async (req, res) => {
     }
 });
 
-app.put('/animals/:id', async (req, res) => {
+app.put('/updateAnimals', async (req, res) => {
     const { id } = req.params;
     const { animal_name, animal_pic } = req.body;
     let connection;
@@ -75,7 +75,7 @@ app.put('/animals/:id', async (req, res) => {
 });
 
 // --- DELETE an animal ---
-app.delete('/animals/:id', async (req, res) => {
+app.delete('/deleteAnimals', async (req, res) => {
     const { id } = req.params;
     let connection;
     try {
