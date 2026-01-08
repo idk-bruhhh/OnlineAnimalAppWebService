@@ -24,7 +24,6 @@ app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
 
-// --- GET: Get all animals ---
 app.get('/getAllAnimals', async (req, res) => {
     let connection;
     try {
@@ -39,7 +38,7 @@ app.get('/getAllAnimals', async (req, res) => {
     }
 });
 
-// --- POST: Add an animal ---
+
 app.post('/addAnimal', async (req, res) => {
     const { animal_name, animal_pic } = req.body;
     if (!animal_name || !animal_pic) {
@@ -62,7 +61,6 @@ app.post('/addAnimal', async (req, res) => {
     }
 });
 
-// --- POST: Update an animal ---
 app.post('/updateAnimal', async (req, res) => {
     const { id, animal_name, animal_pic } = req.body;
     if (!id || !animal_name || !animal_pic) {
@@ -90,7 +88,6 @@ app.post('/updateAnimal', async (req, res) => {
     }
 });
 
-// --- POST: Delete an animal ---
 app.post('/deleteAnimal', async (req, res) => {
     const { id } = req.body;
     if (!id) {
@@ -117,3 +114,31 @@ app.post('/deleteAnimal', async (req, res) => {
         if (connection) await connection.end();
     }
 });
+
+app.get('/deleteAnimal/:id', async (req, res) => {
+    const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ message: 'ID is required' });
+    }
+
+    let connection;
+    try {
+        connection = await mysql.createConnection(dbConfig);
+        const [result] = await connection.execute(
+            'DELETE FROM animals WHERE id = ?',
+            [id]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Animal not found' });
+        }
+
+        res.json({ message: 'Animal deleted successfully (GET route)' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error - could not delete animal (GET route)' });
+    } finally {
+        if (connection) await connection.end();
+    }
+});
+
