@@ -24,8 +24,8 @@ app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
 
-// --- POST: Get all animals ---
-app.post('/getAllAnimals', async (req, res) => {
+// --- GET: Get all animals ---
+app.get('/getAllAnimals', async (req, res) => {
     let connection;
     try {
         connection = await mysql.createConnection(dbConfig);
@@ -43,14 +43,14 @@ app.post('/getAllAnimals', async (req, res) => {
 app.post('/addAnimal', async (req, res) => {
     const { animal_name, animal_pic } = req.body;
     if (!animal_name || !animal_pic) {
-        return res.status(400).json({ message: 'Name and pic are required' });
+        return res.status(400).json({ message: 'animal_name and animal_pic are required' });
     }
 
     let connection;
     try {
         connection = await mysql.createConnection(dbConfig);
         await connection.execute(
-            'INSERT INTO animals (name, pic) VALUES (?, ?)',
+            'INSERT INTO animals (animal_name, animal_pic) VALUES (?, ?)',
             [animal_name, animal_pic]
         );
         res.status(201).json({ message: `Animal ${animal_name} added successfully` });
@@ -66,14 +66,14 @@ app.post('/addAnimal', async (req, res) => {
 app.post('/updateAnimal', async (req, res) => {
     const { id, animal_name, animal_pic } = req.body;
     if (!id || !animal_name || !animal_pic) {
-        return res.status(400).json({ message: 'ID, name, and pic are required' });
+        return res.status(400).json({ message: 'ID, animal_name, and animal_pic are required' });
     }
 
     let connection;
     try {
         connection = await mysql.createConnection(dbConfig);
         const [result] = await connection.execute(
-            'UPDATE animals SET name = ?, pic = ? WHERE id = ?',
+            'UPDATE animals SET animal_name = ?, animal_pic = ? WHERE id = ?',
             [animal_name, animal_pic, id]
         );
 
