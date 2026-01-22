@@ -24,6 +24,9 @@ app.listen(port, () => {
     console.log(`Server started on port ${port}`);
 });
 
+// ================= ROUTES =================
+
+// GET all animals
 app.get('/getAllAnimals', async (req, res) => {
     let connection;
     try {
@@ -38,9 +41,10 @@ app.get('/getAllAnimals', async (req, res) => {
     }
 });
 
-
+// ADD animal
 app.post('/addAnimal', async (req, res) => {
     const { animal_name, animal_pic } = req.body;
+
     if (!animal_name || !animal_pic) {
         return res.status(400).json({ message: 'animal_name and animal_pic are required' });
     }
@@ -55,16 +59,19 @@ app.post('/addAnimal', async (req, res) => {
         res.status(201).json({ message: `Animal ${animal_name} added successfully` });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: `Server error - could not add animal ${animal_name}` });
+        res.status(500).json({ message: 'Server error - could not add animal' });
     } finally {
         if (connection) await connection.end();
     }
 });
 
-app.post('/updateAnimal', async (req, res) => {
-    const { id, animal_name, animal_pic } = req.body;
-    if (!id || !animal_name || !animal_pic) {
-        return res.status(400).json({ message: 'ID, animal_name, and animal_pic are required' });
+// UPDATE animal (PUT like card app)
+app.put('/updateAnimal/:id', async (req, res) => {
+    const { id } = req.params;
+    const { animal_name, animal_pic } = req.body;
+
+    if (!animal_name || !animal_pic) {
+        return res.status(400).json({ message: 'animal_name and animal_pic are required' });
     }
 
     let connection;
@@ -88,11 +95,9 @@ app.post('/updateAnimal', async (req, res) => {
     }
 });
 
-app.post('/deleteAnimal', async (req, res) => {
-    const { id } = req.body;
-    if (!id) {
-        return res.status(400).json({ message: 'ID is required' });
-    }
+// DELETE animal (DELETE like card app)
+app.delete('/deleteAnimal/:id', async (req, res) => {
+    const { id } = req.params;
 
     let connection;
     try {
@@ -114,31 +119,3 @@ app.post('/deleteAnimal', async (req, res) => {
         if (connection) await connection.end();
     }
 });
-
-app.get('/deleteAnimal/:id', async (req, res) => {
-    const { id } = req.params;
-    if (!id) {
-        return res.status(400).json({ message: 'ID is required' });
-    }
-
-    let connection;
-    try {
-        connection = await mysql.createConnection(dbConfig);
-        const [result] = await connection.execute(
-            'DELETE FROM animals WHERE id = ?',
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Animal not found' });
-        }
-
-        res.json({ message: 'Animal deleted successfully (GET route)' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: 'Server error - could not delete animal (GET route)' });
-    } finally {
-        if (connection) await connection.end();
-    }
-});
-
